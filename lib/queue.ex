@@ -69,14 +69,17 @@ defmodule Queue do
   @doc """
   Removes item from the front of the queue.
 
-  # TODO fix this example. When using #Queue it must be at the beginning of expression.
-  # TODO maybe change the inspect output?
+  ## Examples
 
-  # ## Examples
+      iex> queue = Queue.from_list([1, 2])
+      iex> {{:value, 1}, queue} = Queue.out(queue)
+      iex> queue
+      #Queue<[2]>
 
-  #     iex> queue = Queue.from_list([1, 2])
-  #     iex> Queue.out(queue)
-  #     {{:value, 1}, #Queue<[2]>}
+      iex> queue = Queue.new
+      iex> {:empty, queue} = Queue.out(queue)
+      iex> queue
+      #Queue<[]>
 
   """
   def out(queue) do
@@ -89,6 +92,8 @@ defmodule Queue do
         {:empty, wrap_store(updated_store)}
     end
   end
+
+  # TODO continue to add functions from the docs: https://erlang.org/doc/man/queue.html
 
   defp unwrap_store(%Queue{store: store}), do: store
 
