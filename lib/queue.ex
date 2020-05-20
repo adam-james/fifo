@@ -1,6 +1,16 @@
 defmodule Queue do
   @moduledoc """
-  A wrapper around Erlang's `:queue` module.
+  A wrapper around Erlang's `:queue` module. It only includes the Original API.
+  There are two other APIs: the Extended API and the Okasaki API.
+
+  - https://erlang.org/doc/man/queue.html#okasaki-api
+  - https://erlang.org/doc/man/queue.html#extended-api
+  """
+
+  """
+  #TODO debug this:
+    iex(16)> Queue.from_list [7, 8, 9]
+    #Queue<'\a\b\t'>
   """
 
   # TODO add type specs
@@ -63,31 +73,6 @@ defmodule Queue do
 
   """
   def to_list(%Queue{store: store}), do: :queue.to_list(store)
-
-  @doc """
-  Removes item from the front of the queue.
-
-  ## Examples
-
-      iex> queue = Queue.from_list([1, 2])
-      iex> {{:value, 1}, queue} = Queue.out(queue)
-      iex> queue
-      #Queue<[2]>
-
-      iex> queue = Queue.new
-      iex> {:empty, queue} = Queue.out(queue)
-      iex> queue
-      #Queue<[]>
-
-  """
-  def out(%Queue{store: store}) do
-    case :queue.out(store) do
-      {{:value, item}, updated_store} ->
-        {{:value, item}, wrap_store(updated_store)}
-      {:empty, updated_store} ->
-        {:empty, wrap_store(updated_store)}
-    end
-  end
 
   @doc """
   Enqueues an item at the end of the queue. The Erlang library uses the name
@@ -171,7 +156,117 @@ defmodule Queue do
     :queue.join(store1, store2) |> wrap_store
   end
 
-  # TODO continue to add functions from the docs: https://erlang.org/doc/man/queue.html
+  @doc """
+  Returns the length of the queue.
+
+  ## Examples
+
+      iex> queue = Queue.new
+      iex> Queue.len(queue)
+      0
+
+      iex> queue = Queue.from_list([1, 2, 3])
+      iex> Queue.len(queue)
+      3
+
+  """
+  def len(%Queue{store: store}), do: :queue.len(store)
+
+  @doc """
+  Returns `true` if `item` matches a value in queue. Returns `false` if not.
+
+  ## Examples
+
+      iex> queue = Queue.from_list [1, 2, 3]
+      iex> Queue.member?(queue, 2)
+      true
+
+      iex> queue = Queue.from_list [1, 2, 3]
+      iex> Queue.member?(queue, 7)
+      false
+
+  """
+  def member?(%Queue{store: store}, item), do: :queue.member(item, store)
+
+  @doc """
+  Removes item from the front of the queue.
+
+  ## Examples
+
+      iex> queue = Queue.from_list([1, 2])
+      iex> {{:value, 1}, queue} = Queue.out(queue)
+      iex> queue
+      #Queue<[2]>
+
+      iex> queue = Queue.new
+      iex> {:empty, queue} = Queue.out(queue)
+      iex> queue
+      #Queue<[]>
+
+  """
+  def out(%Queue{store: store}) do
+    store |> :queue.out |> handle_out
+  end
+
+  defp handle_out({{:value, item}, updated_store}) do
+    {{:value, item}, wrap_store(updated_store)}
+  end
+
+  defp handle_out({:empty, updated_store}) do
+    {:empty, wrap_store(updated_store)}
+  end
+
+  @doc """
+  Returns an item from the end of the queue.
+
+  ## Examples
+
+      iex> queue = Queue.from_list [1, 2, 3]
+      iex> {{:value, 3}, queue} = Queue.out_r(queue)
+      iex> queue
+      #Queue<[1, 2]>
+
+      iex> queue = Queue.new
+      iex> {:empty, queue} = Queue.out_r(queue)
+      iex> queue
+      #Queue<[]>
+
+  """
+  def out_r(%Queue{store: store}) do
+    store |> :queue.out_r |> handle_out
+  end
+
+  @doc """
+  Reverses a queue.
+
+  ## Examples
+
+      iex> queue = Queue.from_list [1, 2, 3]
+      iex> Queue.reverse(queue)
+      #Queue<[3, 2, 1]>
+
+  """
+  def reverse(%Queue{store: store}) do
+    store |> :queue.reverse |> wrap_store
+  end
+
+  @doc """
+  Splits a queue in two.
+
+  ## Examples
+
+      iex> queue = Queue.from_list [1, 2, 3]
+      iex> {queue2, queue3} = Queue.split(queue, 1)
+      iex> queue2
+      #Queue<[1]>
+      iex> queue3
+      #Queue<[2, 3]>
+
+  """
+  def split(%Queue{store: store}, n) when n >= 0 do
+    {store2, store3} = :queue.split(n, store)
+    {wrap_store(store2), wrap_store(store3)}
+  end
 
   defp wrap_store(store), do: %Queue{store: store}
 
