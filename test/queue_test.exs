@@ -96,4 +96,8 @@ defmodule QueueTest do
       assert queue == Queue.from_list [2, 4]
     end
   end
+
+  test "inspect" do
+    assert inspect(Queue.from_list([?a])) == "#Queue<[97]>"
+  end
 end

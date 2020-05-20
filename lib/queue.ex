@@ -7,12 +7,6 @@ defmodule Queue do
   - https://erlang.org/doc/man/queue.html#extended-api
   """
 
-  """
-  #TODO debug this:
-    iex(16)> Queue.from_list [7, 8, 9]
-    #Queue<'\a\b\t'>
-  """
-
   # TODO add type specs
   # TODO improve docs
 
@@ -30,6 +24,8 @@ defmodule Queue do
   def new do
     :queue.new |> wrap_store
   end
+
+  defp wrap_store(store), do: %Queue{store: store}
 
   @doc """
   Returns a queue from a list.
@@ -268,11 +264,12 @@ defmodule Queue do
     {wrap_store(store2), wrap_store(store3)}
   end
 
-  defp wrap_store(store), do: %Queue{store: store}
-
   defimpl Inspect do
-    def inspect(queue, _) do
-      "#Queue<#{inspect(:queue.to_list(queue.store))}>"
+    import Inspect.Algebra
+
+    def inspect(queue, opts) do
+      opts = %Inspect.Opts{opts | charlists: :as_lists}
+      concat(["#Queue<", Inspect.List.inspect(Queue.to_list(queue), opts), ">"])
     end
   end
 end
