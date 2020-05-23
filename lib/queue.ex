@@ -56,6 +56,9 @@ defmodule Queue do
   # TODO
   # - property based testing?
   # - do you need join, split, member, given Enum? do some benchmarking
+  # - add license
+  # - Github repo
+  # - publish to Hex
 
   defstruct store: :queue.new()
 
@@ -356,7 +359,7 @@ defmodule Queue do
 
   defimpl Enumerable do
     def count(queue) do
-      {:ok, Queue.len(queue)}
+      {:ok, Queue.size(queue)}
     end
 
     def member?(queue, val) do
@@ -364,7 +367,7 @@ defmodule Queue do
     end
 
     def slice(queue) do
-      size = Queue.len(queue)
+      size = Queue.size(queue)
       {:ok, size, &Enumerable.List.slice(Queue.to_list(queue), &1, &2, size)}
     end
 
