@@ -1,17 +1,61 @@
 defmodule Queue do
   @moduledoc """
-  A queue data structure for Elixir.
+  A first-in-first-out queue data structure for Elixir.
 
-  Uses Erlang's `:queue` under the hood: https://erlang.org/doc/man/queue.html.
+  With a first-in-first-out (FIFO) queue, the first item inserted is the first
+  item removed. A real-life analogy is the line, or queue, at the grocery store.
+  The first person to get in line is the first person helped, and that order is
+  maintained until the line is empty.
+
+      iex> queue = Queue.new
+      #Queue<[]>
+      iex> queue = queue |> Queue.push(1) |> Queue.push(2)
+      #Queue<[1, 2]>
+      iex> {{:value, 1}, queue} = Queue.pop(queue)
+      iex> queue
+      #Queue<[2]>
+      iex> {{:value, 2}, queue} = Queue.pop(queue)
+      iex> {:empty, queue} = Queue.pop(queue)
+      iex> queue
+      #Queue<[]>
+
+  Under the hood, this library uses the `:queue` data structure in Erlang's
+  standard library: https://erlang.org/doc/man/queue.html. It wraps the 
+  Original API with a few name changes.
+
+  The reason for this library is to provide a more Elixir idiomatic queue
+  implementation. For example, I renamed Erlang's `is_empty/1` to `empty?/1`.
+  More importantly, I reordered arguments to allow piping, so the queue is the
+  first argument:
+
+      iex> Queue.new |> Queue.push(1) |> Queue.push(2)
+      #Queue<[1, 2]>
+
+  Additionally, this data structure implements three Elixir protocols: `Inspect`,
+  `Enumerable`, and `Collectable`. `Inspect` allows pretty printing, as you can
+  see in the example above. `Enumerable` and `Collectable` are useful for 
+  working with collections.
+
+  A limitation of this implementation is that queues cannot reliably be compared
+  using `==/2`. That is because of the way the Erlang library implements the
+  queue to amortize operations. If you need to compare two queues, you can
+  compare the result of calling `Queue.to_list/1` on each of those queues.
+
+      iex> queue1 = Queue.new(1..3)
+      iex> queue2 = Queue.new |> Queue.push(1) |> Queue.push(2) |> Queue.push(3)
+      iex> queue1 == queue2
+      false
+      iex> Queue.to_list(queue1) == Queue.to_list(queue2)
+      true
+
   """
 
   @opaque queue :: %__MODULE__{store: :queue.queue()}
   @type t :: queue
 
   # TODO
-  # - pare down API
-  # - improve docs
   # - property based testing?
+  # - do you need join, split, member, given Enum? do some benchmarking
 
   defstruct store: :queue.new()
 
@@ -62,7 +106,7 @@ defmodule Queue do
   end
 
   @doc """
-  Returns a queue from a list.
+  Creates a queue from a list.
 
   ## Examples
 
@@ -155,8 +199,7 @@ defmodule Queue do
   def empty?(%Queue{store: store}), do: :queue.is_empty(store)
 
   @doc """
-  Returns `true` given value is a queue. Returns `false` if not. It also check the
-  underlying implementation, ensuring the underlying implementation is also a queue.
+  Returns `true` if the given value is a queue. Returns `false` if not.
 
   ## Examples
 
@@ -164,9 +207,6 @@ defmodule Queue do
       true
 
       iex> Queue.queue? []
-      false
-
-      iex> Queue.queue? %Queue{store: []}
       false
 
   """
@@ -177,7 +217,7 @@ defmodule Queue do
 
   @doc """
   Returns a new queue which is a combination of `queue1` and `queue2`. `queue1`
-  is in front for `queue2`.
+  is in front of `queue2`.
 
   ## Examples
 
@@ -193,7 +233,7 @@ defmodule Queue do
   end
 
   @doc """
-  Returns the length of the queue.
+  Returns the size of the queue.
 
   ## Examples
 
@@ -296,7 +336,7 @@ defmodule Queue do
   end
 
   @doc """
-  Splits a queue in two.
+  Splits a queue into two queues, starting from the given position `n`.
 
   ## Examples
 
