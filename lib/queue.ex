@@ -8,6 +8,7 @@ defmodule Queue do
   """
 
   # TODO add type specs
+  #  - how to get type from :queue
   # TODO improve docs
   # TODO improve testing
 
@@ -46,8 +47,8 @@ defmodule Queue do
 
   ## Examples
 
-    iex> Queue.new([1, 2, 3], fn n -> n * n end)
-    #Queue<[1, 4, 9]>
+      iex> Queue.new([1, 2, 3], fn n -> n * n end)
+      #Queue<[1, 4, 9]>
 
   """
   def new(enumerable, transform) do
