@@ -13,7 +13,7 @@ defmodule Queue do
   # TODO
   # - pare down API
   # - improve docs
-  # - improve testing
+  # - property based testing?
 
   defstruct store: :queue.new()
 
@@ -110,19 +110,17 @@ defmodule Queue do
   def to_list(%Queue{store: store}), do: :queue.to_list(store)
 
   @doc """
-  Enqueues an item at the end of the queue. The Erlang library uses the name
-  `in` for this function. This is not allowed in Elixir as `in` is a reserved word.
-  For that reason, I have called this `in_l` for now. I am considering alternatives.
+  Enqueues an item at the end of the queue.
 
   ## Examples
 
       iex> queue = Queue.from_list([1, 2])
-      iex> Queue.in_l(queue, 3)
+      iex> Queue.push(queue, 3)
       #Queue<[1, 2, 3]>
 
   """
-  @spec in_l(t, term) :: t
-  def in_l(%Queue{store: store}, item) do
+  @spec push(t, term) :: t
+  def push(%Queue{store: store}, item) do
     :queue.in(item, store) |> wrap_store
   end
 
@@ -132,17 +130,17 @@ defmodule Queue do
   ## Examples
 
       iex> queue = Queue.from_list([1, 2])
-      iex> Queue.in_r(queue, 3)
+      iex> Queue.push_r(queue, 3)
       #Queue<[3, 1, 2]>
 
   """
-  @spec in_r(t, term) :: t
-  def in_r(%Queue{store: store}, item) do
+  @spec push_r(t, term) :: t
+  def push_r(%Queue{store: store}, item) do
     :queue.in_r(item, store) |> wrap_store
   end
 
   @doc """
-  Returns `true` if the queue has not items. Returns `false` if the queue has items.
+  Returns `true` if the queue has no items. Returns `false` if the queue has items.
 
   ## Examples
 
@@ -202,16 +200,16 @@ defmodule Queue do
   ## Examples
 
       iex> queue = Queue.new
-      iex> Queue.len(queue)
+      iex> Queue.size(queue)
       0
 
       iex> queue = Queue.from_list([1, 2, 3])
-      iex> Queue.len(queue)
+      iex> Queue.size(queue)
       3
 
   """
-  @spec len(t) :: non_neg_integer
-  def len(%Queue{store: store}), do: :queue.len(store)
+  @spec size(t) :: non_neg_integer
+  def size(%Queue{store: store}), do: :queue.len(store)
 
   @doc """
   Returns `true` if `item` matches a value in queue. Returns `false` if not.
@@ -240,26 +238,26 @@ defmodule Queue do
   ## Examples
 
       iex> queue = Queue.from_list([1, 2])
-      iex> {{:value, 1}, queue} = Queue.out(queue)
+      iex> {{:value, 1}, queue} = Queue.pop(queue)
       iex> queue
       #Queue<[2]>
 
       iex> queue = Queue.new
-      iex> {:empty, queue} = Queue.out(queue)
+      iex> {:empty, queue} = Queue.pop(queue)
       iex> queue
       #Queue<[]>
 
   """
-  @spec out(t) :: value_out | empty_out
-  def out(%Queue{store: store}) do
-    store |> :queue.out() |> handle_out
+  @spec pop(t) :: value_out | empty_out
+  def pop(%Queue{store: store}) do
+    store |> :queue.out() |> handle_pop
   end
 
-  defp handle_out({{:value, item}, updated_store}) do
+  defp handle_pop({{:value, item}, updated_store}) do
     {{:value, item}, wrap_store(updated_store)}
   end
 
-  defp handle_out({:empty, updated_store}) do
+  defp handle_pop({:empty, updated_store}) do
     {:empty, wrap_store(updated_store)}
   end
 
@@ -269,19 +267,19 @@ defmodule Queue do
   ## Examples
 
       iex> queue = Queue.from_list [1, 2, 3]
-      iex> {{:value, 3}, queue} = Queue.out_r(queue)
+      iex> {{:value, 3}, queue} = Queue.pop_r(queue)
       iex> queue
       #Queue<[1, 2]>
 
       iex> queue = Queue.new
-      iex> {:empty, queue} = Queue.out_r(queue)
+      iex> {:empty, queue} = Queue.pop_r(queue)
       iex> queue
       #Queue<[]>
 
   """
-  @spec out_r(t) :: value_out | empty_out
-  def out_r(%Queue{store: store}) do
-    store |> :queue.out_r() |> handle_out
+  @spec pop_r(t) :: value_out | empty_out
+  def pop_r(%Queue{store: store}) do
+    store |> :queue.out_r() |> handle_pop
   end
 
   @doc """
