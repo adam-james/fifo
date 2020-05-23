@@ -82,7 +82,7 @@ defmodule QueueTest do
   end
 
   test "size/1" do
-    assert Queue.size(Queue.new) == 0
+    assert Queue.size(Queue.new()) == 0
     assert Queue.size(Queue.new([1])) == 1
     assert Queue.size(Queue.new(1..100)) == 100
   end
@@ -109,13 +109,13 @@ defmodule QueueTest do
   end
 
   test "reverse/1" do
-    queue = Queue.new([1,2,3])
+    queue = Queue.new([1, 2, 3])
     reversed = Queue.reverse(queue)
     assert Queue.to_list(reversed) == [3, 2, 1]
   end
 
   test "split/2" do
-    queue = Queue.from_list [1, 2, 3]
+    queue = Queue.from_list([1, 2, 3])
     {queue2, queue3} = Queue.split(queue, 1)
 
     assert Queue.to_list(queue2) == [1]

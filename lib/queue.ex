@@ -1,10 +1,8 @@
 defmodule Queue do
   @moduledoc """
-  A wrapper around Erlang's `:queue` module. It only includes the Original API.
-  There are two other APIs: the Extended API and the Okasaki API.
+  A queue data structure for Elixir.
 
-  - https://erlang.org/doc/man/queue.html#okasaki-api
-  - https://erlang.org/doc/man/queue.html#extended-api
+  Uses Erlang's `:queue` under the hood: https://erlang.org/doc/man/queue.html.
   """
 
   @opaque queue :: %__MODULE__{store: :queue.queue()}
