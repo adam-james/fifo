@@ -9,6 +9,7 @@ defmodule Queue do
 
   # TODO add type specs
   # TODO improve docs
+  # TODO improve testing
 
   defstruct store: :queue.new()
 
@@ -26,6 +27,34 @@ defmodule Queue do
   end
 
   defp wrap_store(store), do: %Queue{store: store}
+
+  @doc """
+  Creates a queue from an enumerable.
+
+  ## Examples
+
+      iex> Queue.new([1, 2, 3])
+      #Queue<[1, 2, 3]>
+
+  """
+  def new(enumerable) do
+    Enum.into(enumerable, Queue.new)
+  end
+
+  @doc """
+  Creates a queue from an enumerable via the transformation function.
+
+  ## Examples
+
+    iex> Queue.new([1, 2, 3], fn n -> n * n end)
+    #Queue<[1, 4, 9]>
+
+  """
+  def new(enumerable, transform) do
+    enumerable
+    |> Enum.map(transform)
+    |> Enum.into(Queue.new)
+  end
 
   @doc """
   Returns a queue from a list.
