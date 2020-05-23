@@ -101,3 +101,23 @@ defmodule QueueTest do
     assert inspect(Queue.from_list([?a])) == "#Queue<[97]>"
   end
 end
+
+defmodule QueueTest.EnumerableTest do
+  use ExUnit.Case, async: true
+
+  test "implements Enumerable protocol" do
+    queue = Queue.from_list([1, 2, 3])
+    squared = fn n -> n * n end
+    assert Enum.map(queue, squared) == [1, 4, 9]
+  end
+end
+
+defmodule QueueTest.CollectableTest do
+  use ExUnit.Case, async: true
+
+  test "implements Collectable protocol" do
+    list = [1, 2, 3]
+    queue = Enum.into(list, Queue.new)
+    assert queue == Queue.from_list(list)
+  end
+end

@@ -264,6 +264,37 @@ defmodule Queue do
     {wrap_store(store2), wrap_store(store3)}
   end
 
+  defimpl Enumerable do
+    def count(queue) do
+      {:ok, Queue.len(queue)}
+    end
+
+    def member?(queue, val) do
+      {:ok, Queue.member?(queue, val)}
+    end
+
+    def slice(queue) do
+      size = Queue.len(queue)
+      {:ok, size, &Enumerable.List.slice(Queue.to_list(queue), &1, &2, size)}
+    end
+
+    def reduce(queue, acc, fun) do
+      Enumerable.List.reduce(Queue.to_list(queue), acc, fun)
+    end
+  end
+
+  defimpl Collectable do
+    def into(queue) do
+      fun = fn
+        list, {:cont, x} -> [x | list]
+        list, :done -> Queue.join(queue, Queue.from_list(Enum.reverse(list)))
+        _, :halt -> :ok
+      end
+
+      {[], fun}
+    end
+  end
+
   defimpl Inspect do
     import Inspect.Algebra
 
