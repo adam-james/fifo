@@ -10,7 +10,7 @@ defmodule QueueTest do
 
   describe "from_list/1" do
     test "returns a queue from a list" do
-      list = [1,2,3]
+      list = [1, 2, 3]
       queue = Queue.from_list(list)
       assert Queue.to_list(queue) == list
     end
@@ -19,14 +19,14 @@ defmodule QueueTest do
   describe "to_list/1" do
     test "returns a list of items in the queue" do
       list = [1, 2, 3, 4]
-      queue = Queue.from_list list
+      queue = Queue.from_list(list)
       assert Queue.to_list(queue) == list
     end
   end
 
   describe "in_l/2" do
     test "enqueues an item at end of queue" do
-      queue = Queue.from_list [1, 2]
+      queue = Queue.from_list([1, 2])
       queue = Queue.in_l(queue, 3)
       assert Queue.to_list(queue) == [1, 2, 3]
     end
@@ -34,7 +34,7 @@ defmodule QueueTest do
 
   describe "in_r/2" do
     test "enqueues an item at the front of the queue" do
-      queue = Queue.from_list [1, 2]
+      queue = Queue.from_list([1, 2])
       queue = Queue.in_r(queue, 3)
       assert Queue.to_list(queue) == [3, 1, 2]
     end
@@ -42,19 +42,19 @@ defmodule QueueTest do
 
   describe "empty?/1" do
     test "returns true when queue is empty" do
-      queue = Queue.new
+      queue = Queue.new()
       assert Queue.empty?(queue) == true
     end
 
     test "returns false when queue is not empty" do
-      queue = Queue.from_list [1]
+      queue = Queue.from_list([1])
       assert Queue.empty?(queue) == false
     end
   end
 
   describe "queue?/1" do
     test "returns true when is a queue" do
-      queue = Queue.new
+      queue = Queue.new()
       assert Queue.queue?(queue) == true
     end
 
@@ -81,7 +81,7 @@ defmodule QueueTest do
 
   describe "out/1" do
     test "removes item from the queue" do
-      queue = Queue.from_list [1, 2]
+      queue = Queue.from_list([1, 2])
       assert {{:value, 1}, %Queue{} = queue} = Queue.out(queue)
       assert {{:value, 2}, %Queue{} = queue} = Queue.out(queue)
       assert {:empty, queue} = Queue.out(queue)
@@ -90,10 +90,10 @@ defmodule QueueTest do
 
   describe "filter/2" do
     test "filters items in a queue" do
-      queue = Queue.from_list [1, 2, 3, 4]
+      queue = Queue.from_list([1, 2, 3, 4])
       even_only = fn item -> rem(item, 2) == 0 end
       queue = Queue.filter(queue, even_only)
-      assert queue == Queue.from_list [2, 4]
+      assert queue == Queue.from_list([2, 4])
     end
   end
 
@@ -117,7 +117,7 @@ defmodule QueueTest.CollectableTest do
 
   test "implements Collectable protocol" do
     list = [1, 2, 3]
-    queue = Enum.into(list, Queue.new)
+    queue = Enum.into(list, Queue.new())
     assert queue == Queue.from_list(list)
   end
 end

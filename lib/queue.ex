@@ -7,10 +7,13 @@ defmodule Queue do
   - https://erlang.org/doc/man/queue.html#extended-api
   """
 
-  # TODO add type specs
-  #  - how to get type from :queue
-  # TODO improve docs
-  # TODO improve testing
+  @opaque queue :: %__MODULE__{store: :queue.queue()}
+  @type t :: queue
+
+  # TODO
+  # - pare down API
+  # - improve docs
+  # - improve testing
 
   defstruct store: :queue.new()
 
@@ -23,8 +26,9 @@ defmodule Queue do
       #Queue<[]>
 
   """
+  @spec new :: t
   def new do
-    :queue.new |> wrap_store
+    :queue.new() |> wrap_store
   end
 
   defp wrap_store(store), do: %Queue{store: store}
@@ -38,8 +42,9 @@ defmodule Queue do
       #Queue<[1, 2, 3]>
 
   """
+  @spec new(Enum.t()) :: t
   def new(enumerable) do
-    Enum.into(enumerable, Queue.new)
+    Enum.into(enumerable, Queue.new())
   end
 
   @doc """
@@ -51,10 +56,11 @@ defmodule Queue do
       #Queue<[1, 4, 9]>
 
   """
+  @spec new(Enum.t(), (term -> term)) :: t
   def new(enumerable, transform) do
     enumerable
     |> Enum.map(transform)
-    |> Enum.into(Queue.new)
+    |> Enum.into(Queue.new())
   end
 
   @doc """
@@ -66,8 +72,9 @@ defmodule Queue do
       #Queue<[1, 2, 3]>
 
   """
+  @spec from_list(list) :: t
   def from_list(list) when is_list(list) do
-    list |> :queue.from_list |> wrap_store
+    list |> :queue.from_list() |> wrap_store
   end
 
   @doc """
@@ -80,6 +87,7 @@ defmodule Queue do
       #Queue<[1, 3]>
 
   """
+  @spec filter(t, (term -> boolean)) :: t
   def filter(%Queue{store: store}, func) do
     store |> do_filter(func) |> wrap_store
   end
@@ -98,6 +106,7 @@ defmodule Queue do
       [1, 2, 3, 4]
 
   """
+  @spec to_list(t) :: list
   def to_list(%Queue{store: store}), do: :queue.to_list(store)
 
   @doc """
@@ -112,6 +121,7 @@ defmodule Queue do
       #Queue<[1, 2, 3]>
 
   """
+  @spec in_l(t, term) :: t
   def in_l(%Queue{store: store}, item) do
     :queue.in(item, store) |> wrap_store
   end
@@ -126,6 +136,7 @@ defmodule Queue do
       #Queue<[3, 1, 2]>
 
   """
+  @spec in_r(t, term) :: t
   def in_r(%Queue{store: store}, item) do
     :queue.in_r(item, store) |> wrap_store
   end
@@ -144,6 +155,7 @@ defmodule Queue do
       false
 
   """
+  @spec empty?(t) :: boolean
   def empty?(%Queue{store: store}), do: :queue.is_empty(store)
 
   @doc """
@@ -162,6 +174,7 @@ defmodule Queue do
       false
 
   """
+  @spec queue?(t) :: boolean
   def queue?(%Queue{store: store}), do: :queue.is_queue(store)
 
   def queue?(_), do: false
@@ -178,6 +191,7 @@ defmodule Queue do
       #Queue<[1, 2, 3, 4]>
 
   """
+  @spec join(t, t) :: t
   def join(%Queue{store: store1}, %Queue{store: store2}) do
     :queue.join(store1, store2) |> wrap_store
   end
@@ -196,6 +210,7 @@ defmodule Queue do
       3
 
   """
+  @spec len(t) :: non_neg_integer
   def len(%Queue{store: store}), do: :queue.len(store)
 
   @doc """
@@ -212,7 +227,12 @@ defmodule Queue do
       false
 
   """
+  @spec member?(t, term) :: boolean
   def member?(%Queue{store: store}, item), do: :queue.member(item, store)
+
+  @type tagged_value(term) :: {:value, term}
+  @type value_out :: {tagged_value(term), t}
+  @type empty_out :: {:empty, t}
 
   @doc """
   Removes item from the front of the queue.
@@ -230,8 +250,9 @@ defmodule Queue do
       #Queue<[]>
 
   """
+  @spec out(t) :: value_out | empty_out
   def out(%Queue{store: store}) do
-    store |> :queue.out |> handle_out
+    store |> :queue.out() |> handle_out
   end
 
   defp handle_out({{:value, item}, updated_store}) do
@@ -258,8 +279,9 @@ defmodule Queue do
       #Queue<[]>
 
   """
+  @spec out_r(t) :: value_out | empty_out
   def out_r(%Queue{store: store}) do
-    store |> :queue.out_r |> handle_out
+    store |> :queue.out_r() |> handle_out
   end
 
   @doc """
@@ -272,8 +294,9 @@ defmodule Queue do
       #Queue<[3, 2, 1]>
 
   """
+  @spec reverse(t) :: t
   def reverse(%Queue{store: store}) do
-    store |> :queue.reverse |> wrap_store
+    store |> :queue.reverse() |> wrap_store
   end
 
   @doc """
@@ -289,6 +312,7 @@ defmodule Queue do
       #Queue<[2, 3]>
 
   """
+  @spec split(t, integer) :: {t, t}
   def split(%Queue{store: store}, n) when n >= 0 do
     {store2, store3} = :queue.split(n, store)
     {wrap_store(store2), wrap_store(store3)}
