@@ -127,24 +127,24 @@ defmodule QueueTest.EnumerableTest do
   use ExUnit.Case, async: true
 
   test "implements count/1" do
-    queue = Queue.new
+    queue = Queue.new()
     assert Enum.count(queue) == 0
-    queue = Queue.new 1..100
+    queue = Queue.new(1..100)
     assert Enum.count(queue) == 100
   end
 
   test "implements member?/2" do
-    queue = Queue.new
+    queue = Queue.new()
     refute Queue.member?(queue, 3)
-    queue = Queue.new 1..100
+    queue = Queue.new(1..100)
     assert Queue.member?(queue, 1)
     assert Queue.member?(queue, 10)
     assert Queue.member?(queue, 100)
   end
-  
+
   # TODO arity?
   test "implements slice" do
-    queue = Queue.new 1..10
+    queue = Queue.new(1..10)
     assert Enum.slice(queue, 1..3) == [2, 3, 4]
   end
 

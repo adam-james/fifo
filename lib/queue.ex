@@ -54,11 +54,10 @@ defmodule Queue do
   @type t :: queue
 
   # TODO
-  # - property based testing?
-  # - do you need join, split, member, given Enum? do some benchmarking
   # - add license
   # - Github repo
   # - publish to Hex
+  # - property based testing?
 
   defstruct store: :queue.new()
 
