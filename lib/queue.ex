@@ -54,7 +54,6 @@ defmodule Queue do
   @type t :: queue
 
   # TODO
-  # - add license
   # - Github repo
   # - publish to Hex
   # - property based testing?
@@ -88,7 +87,9 @@ defmodule Queue do
   """
   @spec new(Enum.t()) :: t
   def new(enumerable) do
-    Enum.into(enumerable, Queue.new())
+    enumerable
+    |> Enum.to_list()
+    |> from_list
   end
 
   @doc """
@@ -104,7 +105,7 @@ defmodule Queue do
   def new(enumerable, transform) do
     enumerable
     |> Enum.map(transform)
-    |> Enum.into(Queue.new())
+    |> from_list
   end
 
   @doc """
