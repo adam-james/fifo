@@ -1,6 +1,7 @@
 # Queue
 
-**TODO: Add description**
+A first-in-first-out queue data structure for Elixir. Uses Erlang's `:queue`
+library under the hood: https://erlang.org/doc/man/queue.html.
 
 ## Installation
 
