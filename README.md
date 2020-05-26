@@ -29,6 +29,7 @@ benchmarks. These are located in the `bench` folder. You run them like this:
 
 Often an alternative exists because there is a `Queue` implementation and an
 `Enum` implementation. The `Queue` implementations are faster because they
-utilize the Erlang `:queue` library, which is optimized. I recommend you use
-the `Queue` implementations where they exist, e.g. `Queue.filter/2` instead of
-`Enum.filter/2`.
+utilize the Erlang `:queue` library, which is optimized. For example,
+`Queue.reverse/1` runs in constant time, `O(1)`, whereas `Enum.reverse/1` runs
+in linear time, `O(n)`. I recommend you use the `Queue` implementations when
+possible, i.e. `Queue.reverse/1` instead of `Enum.reverse/1`.
