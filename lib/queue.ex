@@ -39,13 +39,13 @@ defmodule Queue do
   A limitation of this implementation is that queues cannot reliably be compared
   using `==/2`. That is because of the way the Erlang library implements the
   queue to amortize operations. If you need to compare two queues, you can
-  compare the result of calling `Queue.to_list/1` on each of those queues.
+  use `Queue.equal?/2`.
 
       iex> queue1 = Queue.new(1..3)
       iex> queue2 = Queue.new |> Queue.push(1) |> Queue.push(2) |> Queue.push(3)
       iex> queue1 == queue2
       false
-      iex> Queue.to_list(queue1) == Queue.to_list(queue2)
+      iex> Queue.equal?(queue1, queue2)
       true
 
   """
@@ -120,6 +120,30 @@ defmodule Queue do
   @spec from_list(list) :: t
   def from_list(list) when is_list(list) do
     list |> :queue.from_list() |> wrap_store
+  end
+
+  @doc """
+  Compares two lists. Returns `true` if they contain the same items in the same
+  order, returns `false` if not.
+
+  Because of the implementation of `:queue`, you cannot reliably compare two
+  queues using `==/2`. Use `Queue.equal?/2` instead.
+
+  ## Examples
+
+      iex> queue1 = Queue.new([1, 2, 3])
+      iex> queue2 = Queue.new([1, 2, 3])
+      iex> Queue.equal?(queue1, queue2)
+      true
+
+      iex> queue1 = Queue.new([1, 2, 3])
+      iex> queue2 = Queue.new([1, 2])
+      iex> Queue.equal?(queue1, queue2)
+      false
+  """
+  @spec equal?(t, t) :: boolean
+  def equal?(%Queue{} = queue1, %Queue{} = queue2) do
+    to_list(queue1) == to_list(queue2)
   end
 
   @doc """

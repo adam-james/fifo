@@ -29,6 +29,18 @@ defmodule QueueTest do
     assert Queue.to_list(queue) == list
   end
 
+  test "equal?/2" do
+    queue1 = Queue.new([1, 2, 3])
+    queue2 = Queue.new |> Queue.push(1) |> Queue.push(2) |> Queue.push(3)
+    assert Queue.equal?(queue1, queue2)
+
+    queue3 = Queue.reverse(queue2)
+    refute Queue.equal?(queue1, queue3)
+
+    queue4 = Queue.new([3, 4, 5])
+    refute Queue.equal?(queue1, queue4)
+  end
+
   test "filter/2" do
     queue = Queue.from_list([1, 2, 3, 4])
     even_only = fn item -> rem(item, 2) == 0 end
