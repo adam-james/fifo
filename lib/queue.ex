@@ -257,11 +257,11 @@ defmodule Queue do
 
   ## Examples
 
-      iex> queue = Queue.from_list [1, 2, 3]
+      iex> queue = Queue.from_list([1, 2, 3])
       iex> Queue.member?(queue, 2)
       true
 
-      iex> queue = Queue.from_list [1, 2, 3]
+      iex> queue = Queue.from_list([1, 2, 3])
       iex> Queue.member?(queue, 7)
       false
 
@@ -307,7 +307,7 @@ defmodule Queue do
 
   ## Examples
 
-      iex> queue = Queue.from_list [1, 2, 3]
+      iex> queue = Queue.from_list([1, 2, 3])
       iex> {{:value, 3}, queue} = Queue.pop_r(queue)
       iex> queue
       #Queue<[1, 2]>
@@ -328,7 +328,7 @@ defmodule Queue do
 
   ## Examples
 
-      iex> queue = Queue.from_list [1, 2, 3]
+      iex> queue = Queue.from_list([1, 2, 3])
       iex> Queue.reverse(queue)
       #Queue<[3, 2, 1]>
 
@@ -343,7 +343,7 @@ defmodule Queue do
 
   ## Examples
 
-      iex> queue = Queue.from_list [1, 2, 3]
+      iex> queue = Queue.from_list([1, 2, 3])
       iex> {queue2, queue3} = Queue.split(queue, 1)
       iex> queue2
       #Queue<[1]>
