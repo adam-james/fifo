@@ -31,7 +31,7 @@ defmodule QueueTest do
 
   test "equal?/2" do
     queue1 = Queue.new([1, 2, 3])
-    queue2 = Queue.new |> Queue.push(1) |> Queue.push(2) |> Queue.push(3)
+    queue2 = Queue.new() |> Queue.push(1) |> Queue.push(2) |> Queue.push(3)
     assert Queue.equal?(queue1, queue2)
 
     queue3 = Queue.reverse(queue2)

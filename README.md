@@ -1,7 +1,10 @@
 # Queue
 
-A first-in-first-out queue data structure for Elixir. Uses Erlang's `:queue`
-library: https://erlang.org/doc/man/queue.html.
+A first-in-first-out queue data structure for Elixir. It wraps Erlang's
+[:queue](https://erlang.org/doc/man/queue.html) in a more Elixir-friendly API.
+It implements the `Inspect` protocol for pretty printing. It also implements the
+`Enumerable` and `Collectable` protocols for working with collections. Functions
+take a `Queue` as the first argument to allow for piping.
 
 <!-- TODO -->
 <!-- ## Installation
@@ -33,8 +36,6 @@ iex(5)> {_, queue} = Queue.pop(queue)
 ```
 
 ## Enumerable and Collectable
-
-`Queue` implements Elixir's `Enumerable` and `Collectable` protocols.
 
 ```
 iex(37)> queue = Queue.new([1, 2])
