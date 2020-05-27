@@ -54,7 +54,6 @@ defmodule Queue do
   @type t :: queue
 
   # TODO
-  # - Github repo
   # - publish to Hex
   # - property based testing?
 
@@ -140,6 +139,7 @@ defmodule Queue do
       iex> queue2 = Queue.new([1, 2])
       iex> Queue.equal?(queue1, queue2)
       false
+
   """
   @spec equal?(t, t) :: boolean
   def equal?(%Queue{} = queue1, %Queue{} = queue2) do
