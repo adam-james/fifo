@@ -93,10 +93,10 @@ defmodule QueueTest do
     assert Queue.to_list(queue3) == [1, 2, 3, 4]
   end
 
-  test "size/1" do
-    assert Queue.size(Queue.new()) == 0
-    assert Queue.size(Queue.new([1])) == 1
-    assert Queue.size(Queue.new(1..100)) == 100
+  test "length/1" do
+    assert Queue.length(Queue.new()) == 0
+    assert Queue.length(Queue.new([1])) == 1
+    assert Queue.length(Queue.new(1..100)) == 100
   end
 
   test "member?/2" do

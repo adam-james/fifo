@@ -259,22 +259,26 @@ defmodule Queue do
     :queue.join(store1, store2) |> wrap_store
   end
 
+  # TODO rename this length
+  # It has to be computed. `length` means it is precomputed in Elixir vocabulary.
+  # `length` means it has to be computed.
+
   @doc """
-  Returns the size of the queue.
+  Returns the length of the queue.
 
   ## Examples
 
       iex> queue = Queue.new
-      iex> Queue.size(queue)
+      iex> Queue.length(queue)
       0
 
       iex> queue = Queue.from_list([1, 2, 3])
-      iex> Queue.size(queue)
+      iex> Queue.length(queue)
       3
 
   """
-  @spec size(t) :: non_neg_integer
-  def size(%Queue{store: store}), do: :queue.len(store)
+  @spec length(t) :: non_neg_integer
+  def length(%Queue{store: store}), do: :queue.len(store)
 
   @doc """
   Returns `true` if `item` matches a value in queue. Returns `false` if not.
@@ -383,7 +387,7 @@ defmodule Queue do
 
   defimpl Enumerable do
     def count(queue) do
-      {:ok, Queue.size(queue)}
+      {:ok, Queue.length(queue)}
     end
 
     def member?(queue, val) do
@@ -391,8 +395,8 @@ defmodule Queue do
     end
 
     def slice(queue) do
-      size = Queue.size(queue)
-      {:ok, size, &Enumerable.List.slice(Queue.to_list(queue), &1, &2, size)}
+      length = Queue.length(queue)
+      {:ok, length, &Enumerable.List.slice(Queue.to_list(queue), &1, &2, length)}
     end
 
     def reduce(queue, acc, fun) do
