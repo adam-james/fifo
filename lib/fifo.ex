@@ -1,4 +1,4 @@
-defmodule Queue do
+defmodule FIFO do
   @moduledoc """
   A first-in-first-out queue data structure for Elixir.
 
@@ -7,17 +7,17 @@ defmodule Queue do
   The first person to get in line is the first person helped, and that order is
   maintained until the line is empty.
 
-      iex> queue = Queue.new
-      #Queue<[]>
-      iex> queue = queue |> Queue.push(1) |> Queue.push(2)
-      #Queue<[1, 2]>
-      iex> {{:value, 1}, queue} = Queue.pop(queue)
+      iex> queue = FIFO.new
+      #FIFO<[]>
+      iex> queue = queue |> FIFO.push(1) |> FIFO.push(2)
+      #FIFO<[1, 2]>
+      iex> {{:value, 1}, queue} = FIFO.pop(queue)
       iex> queue
-      #Queue<[2]>
-      iex> {{:value, 2}, queue} = Queue.pop(queue)
-      iex> {:empty, queue} = Queue.pop(queue)
+      #FIFO<[2]>
+      iex> {{:value, 2}, queue} = FIFO.pop(queue)
+      iex> {:empty, queue} = FIFO.pop(queue)
       iex> queue
-      #Queue<[]>
+      #FIFO<[]>
 
   Under the hood, this library uses the `:queue` data structure in Erlang's
   standard library: https://erlang.org/doc/man/queue.html. It wraps the 
@@ -28,8 +28,8 @@ defmodule Queue do
   More importantly, I reordered arguments to allow piping, so the queue is the
   first argument:
 
-      iex> Queue.new |> Queue.push(1) |> Queue.push(2)
-      #Queue<[1, 2]>
+      iex> FIFO.new |> FIFO.push(1) |> FIFO.push(2)
+      #FIFO<[1, 2]>
 
   Additionally, this data structure implements three Elixir protocols: `Inspect`,
   `Enumerable`, and `Collectable`. `Inspect` allows pretty printing, as you can
@@ -39,23 +39,19 @@ defmodule Queue do
   A limitation of this implementation is that queues cannot reliably be compared
   using `==/2`. That is because of the way the Erlang library implements the
   queue to amortize operations. If you need to compare two queues, you can
-  use `Queue.equal?/2`.
+  use `FIFO.equal?/2`.
 
-      iex> queue1 = Queue.new(1..3)
-      iex> queue2 = Queue.new |> Queue.push(1) |> Queue.push(2) |> Queue.push(3)
+      iex> queue1 = FIFO.new(1..3)
+      iex> queue2 = FIFO.new |> FIFO.push(1) |> FIFO.push(2) |> FIFO.push(3)
       iex> queue1 == queue2
       false
-      iex> Queue.equal?(queue1, queue2)
+      iex> FIFO.equal?(queue1, queue2)
       true
 
   """
 
   @opaque queue :: %__MODULE__{store: :queue.queue()}
   @type t :: queue
-
-  # TODO
-  # - publish to Hex
-  # - property based testing?
 
   defstruct store: :queue.new()
 
@@ -64,8 +60,8 @@ defmodule Queue do
 
   ## Examples
 
-      iex> Queue.new()
-      #Queue<[]>
+      iex> FIFO.new()
+      #FIFO<[]>
 
   """
   @spec new :: t
@@ -73,15 +69,15 @@ defmodule Queue do
     :queue.new() |> wrap_store
   end
 
-  defp wrap_store(store), do: %Queue{store: store}
+  defp wrap_store(store), do: %FIFO{store: store}
 
   @doc """
   Creates a queue from an enumerable.
 
   ## Examples
 
-      iex> Queue.new([1, 2, 3])
-      #Queue<[1, 2, 3]>
+      iex> FIFO.new([1, 2, 3])
+      #FIFO<[1, 2, 3]>
 
   """
   @spec new(Enum.t()) :: t
@@ -96,8 +92,8 @@ defmodule Queue do
 
   ## Examples
 
-      iex> Queue.new([1, 2, 3], fn n -> n * n end)
-      #Queue<[1, 4, 9]>
+      iex> FIFO.new([1, 2, 3], fn n -> n * n end)
+      #FIFO<[1, 4, 9]>
 
   """
   @spec new(Enum.t(), (term -> term)) :: t
@@ -112,8 +108,8 @@ defmodule Queue do
 
   ## Examples
 
-      iex> Queue.from_list([1,2,3])
-      #Queue<[1, 2, 3]>
+      iex> FIFO.from_list([1, 2, 3])
+      #FIFO<[1, 2, 3]>
 
   """
   @spec from_list(list) :: t
@@ -122,27 +118,27 @@ defmodule Queue do
   end
 
   @doc """
-  Compares two lists. Returns `true` if they contain the same items in the same
+  Compares two queues. Returns `true` if they contain the same items in the same
   order, returns `false` if not.
 
   Because of the implementation of `:queue`, you cannot reliably compare two
-  queues using `==/2`. Use `Queue.equal?/2` instead.
+  queues using `==/2`. Use `FIFO.equal?/2` instead.
 
   ## Examples
 
-      iex> queue1 = Queue.new([1, 2, 3])
-      iex> queue2 = Queue.new([1, 2, 3])
-      iex> Queue.equal?(queue1, queue2)
+      iex> queue1 = FIFO.new([1, 2, 3])
+      iex> queue2 = FIFO.new([1, 2, 3])
+      iex> FIFO.equal?(queue1, queue2)
       true
 
-      iex> queue1 = Queue.new([1, 2, 3])
-      iex> queue2 = Queue.new([1, 2])
-      iex> Queue.equal?(queue1, queue2)
+      iex> queue1 = FIFO.new([1, 2, 3])
+      iex> queue2 = FIFO.new([1, 2])
+      iex> FIFO.equal?(queue1, queue2)
       false
 
   """
   @spec equal?(t, t) :: boolean
-  def equal?(%Queue{} = queue1, %Queue{} = queue2) do
+  def equal?(%FIFO{} = queue1, %FIFO{} = queue2) do
     to_list(queue1) == to_list(queue2)
   end
 
@@ -151,13 +147,13 @@ defmodule Queue do
 
   ## Examples
 
-      iex> queue = Queue.from_list([1,2,3,4])
-      iex> Queue.filter(queue, fn item -> rem(item, 2) != 0 end)
-      #Queue<[1, 3]>
+      iex> queue = FIFO.from_list([1,2,3,4])
+      iex> FIFO.filter(queue, fn item -> rem(item, 2) != 0 end)
+      #FIFO<[1, 3]>
 
   """
   @spec filter(t, (term -> boolean)) :: t
-  def filter(%Queue{store: store}, func) do
+  def filter(%FIFO{store: store}, func) do
     store |> do_filter(func) |> wrap_store
   end
 
@@ -170,26 +166,26 @@ defmodule Queue do
 
   ## Examples
 
-      iex> queue = Queue.from_list([1, 2, 3, 4])
-      iex> Queue.to_list(queue)
+      iex> queue = FIFO.from_list([1, 2, 3, 4])
+      iex> FIFO.to_list(queue)
       [1, 2, 3, 4]
 
   """
   @spec to_list(t) :: list
-  def to_list(%Queue{store: store}), do: :queue.to_list(store)
+  def to_list(%FIFO{store: store}), do: :queue.to_list(store)
 
   @doc """
   Enqueues an item at the end of the queue.
 
   ## Examples
 
-      iex> queue = Queue.from_list([1, 2])
-      iex> Queue.push(queue, 3)
-      #Queue<[1, 2, 3]>
+      iex> queue = FIFO.from_list([1, 2])
+      iex> FIFO.push(queue, 3)
+      #FIFO<[1, 2, 3]>
 
   """
   @spec push(t, term) :: t
-  def push(%Queue{store: store}, item) do
+  def push(%FIFO{store: store}, item) do
     :queue.in(item, store) |> wrap_store
   end
 
@@ -198,13 +194,13 @@ defmodule Queue do
 
   ## Examples
 
-      iex> queue = Queue.from_list([1, 2])
-      iex> Queue.push_r(queue, 3)
-      #Queue<[3, 1, 2]>
+      iex> queue = FIFO.from_list([1, 2])
+      iex> FIFO.push_r(queue, 3)
+      #FIFO<[3, 1, 2]>
 
   """
   @spec push_r(t, term) :: t
-  def push_r(%Queue{store: store}, item) do
+  def push_r(%FIFO{store: store}, item) do
     :queue.in_r(item, store) |> wrap_store
   end
 
@@ -213,32 +209,32 @@ defmodule Queue do
 
   ## Examples
 
-      iex> queue = Queue.new
-      iex> Queue.empty?(queue)
+      iex> queue = FIFO.new
+      iex> FIFO.empty?(queue)
       true
 
-      iex> queue = Queue.from_list([1])
-      iex> Queue.empty?(queue)
+      iex> queue = FIFO.from_list([1])
+      iex> FIFO.empty?(queue)
       false
 
   """
   @spec empty?(t) :: boolean
-  def empty?(%Queue{store: store}), do: :queue.is_empty(store)
+  def empty?(%FIFO{store: store}), do: :queue.is_empty(store)
 
   @doc """
   Returns `true` if the given value is a queue. Returns `false` if not.
 
   ## Examples
 
-      iex> Queue.queue? Queue.new
+      iex> FIFO.queue?(FIFO.new)
       true
 
-      iex> Queue.queue? []
+      iex> FIFO.queue?([])
       false
 
   """
   @spec queue?(t) :: boolean
-  def queue?(%Queue{store: store}), do: :queue.is_queue(store)
+  def queue?(%FIFO{store: store}), do: :queue.is_queue(store)
 
   def queue?(_), do: false
 
@@ -248,54 +244,50 @@ defmodule Queue do
 
   ## Examples
 
-      iex> queue1 = Queue.from_list([1, 2])
-      iex> queue2 = Queue.from_list([3, 4])
-      iex> Queue.join(queue1, queue2)
-      #Queue<[1, 2, 3, 4]>
+      iex> queue1 = FIFO.from_list([1, 2])
+      iex> queue2 = FIFO.from_list([3, 4])
+      iex> FIFO.join(queue1, queue2)
+      #FIFO<[1, 2, 3, 4]>
 
   """
   @spec join(t, t) :: t
-  def join(%Queue{store: store1}, %Queue{store: store2}) do
+  def join(%FIFO{store: store1}, %FIFO{store: store2}) do
     :queue.join(store1, store2) |> wrap_store
   end
-
-  # TODO rename this length
-  # It has to be computed. `length` means it is precomputed in Elixir vocabulary.
-  # `length` means it has to be computed.
 
   @doc """
   Returns the length of the queue.
 
   ## Examples
 
-      iex> queue = Queue.new
-      iex> Queue.length(queue)
+      iex> queue = FIFO.new
+      iex> FIFO.length(queue)
       0
 
-      iex> queue = Queue.from_list([1, 2, 3])
-      iex> Queue.length(queue)
+      iex> queue = FIFO.from_list([1, 2, 3])
+      iex> FIFO.length(queue)
       3
 
   """
   @spec length(t) :: non_neg_integer
-  def length(%Queue{store: store}), do: :queue.len(store)
+  def length(%FIFO{store: store}), do: :queue.len(store)
 
   @doc """
   Returns `true` if `item` matches a value in queue. Returns `false` if not.
 
   ## Examples
 
-      iex> queue = Queue.from_list([1, 2, 3])
-      iex> Queue.member?(queue, 2)
+      iex> queue = FIFO.from_list([1, 2, 3])
+      iex> FIFO.member?(queue, 2)
       true
 
-      iex> queue = Queue.from_list([1, 2, 3])
-      iex> Queue.member?(queue, 7)
+      iex> queue = FIFO.from_list([1, 2, 3])
+      iex> FIFO.member?(queue, 7)
       false
 
   """
   @spec member?(t, term) :: boolean
-  def member?(%Queue{store: store}, item), do: :queue.member(item, store)
+  def member?(%FIFO{store: store}, item), do: :queue.member(item, store)
 
   @type tagged_value(term) :: {:value, term}
   @type value_out :: {tagged_value(term), t}
@@ -306,19 +298,19 @@ defmodule Queue do
 
   ## Examples
 
-      iex> queue = Queue.from_list([1, 2])
-      iex> {{:value, 1}, queue} = Queue.pop(queue)
+      iex> queue = FIFO.from_list([1, 2])
+      iex> {{:value, 1}, queue} = FIFO.pop(queue)
       iex> queue
-      #Queue<[2]>
+      #FIFO<[2]>
 
-      iex> queue = Queue.new
-      iex> {:empty, queue} = Queue.pop(queue)
+      iex> queue = FIFO.new
+      iex> {:empty, queue} = FIFO.pop(queue)
       iex> queue
-      #Queue<[]>
+      #FIFO<[]>
 
   """
   @spec pop(t) :: value_out | empty_out
-  def pop(%Queue{store: store}) do
+  def pop(%FIFO{store: store}) do
     store |> :queue.out() |> handle_pop
   end
 
@@ -335,19 +327,19 @@ defmodule Queue do
 
   ## Examples
 
-      iex> queue = Queue.from_list([1, 2, 3])
-      iex> {{:value, 3}, queue} = Queue.pop_r(queue)
+      iex> queue = FIFO.from_list([1, 2, 3])
+      iex> {{:value, 3}, queue} = FIFO.pop_r(queue)
       iex> queue
-      #Queue<[1, 2]>
+      #FIFO<[1, 2]>
 
-      iex> queue = Queue.new
-      iex> {:empty, queue} = Queue.pop_r(queue)
+      iex> queue = FIFO.new
+      iex> {:empty, queue} = FIFO.pop_r(queue)
       iex> queue
-      #Queue<[]>
+      #FIFO<[]>
 
   """
   @spec pop_r(t) :: value_out | empty_out
-  def pop_r(%Queue{store: store}) do
+  def pop_r(%FIFO{store: store}) do
     store |> :queue.out_r() |> handle_pop
   end
 
@@ -356,13 +348,13 @@ defmodule Queue do
 
   ## Examples
 
-      iex> queue = Queue.from_list([1, 2, 3])
-      iex> Queue.reverse(queue)
-      #Queue<[3, 2, 1]>
+      iex> queue = FIFO.from_list([1, 2, 3])
+      iex> FIFO.reverse(queue)
+      #FIFO<[3, 2, 1]>
 
   """
   @spec reverse(t) :: t
-  def reverse(%Queue{store: store}) do
+  def reverse(%FIFO{store: store}) do
     store |> :queue.reverse() |> wrap_store
   end
 
@@ -371,36 +363,36 @@ defmodule Queue do
 
   ## Examples
 
-      iex> queue = Queue.from_list([1, 2, 3])
-      iex> {queue2, queue3} = Queue.split(queue, 1)
+      iex> queue = FIFO.from_list([1, 2, 3])
+      iex> {queue2, queue3} = FIFO.split(queue, 1)
       iex> queue2
-      #Queue<[1]>
+      #FIFO<[1]>
       iex> queue3
-      #Queue<[2, 3]>
+      #FIFO<[2, 3]>
 
   """
   @spec split(t, integer) :: {t, t}
-  def split(%Queue{store: store}, n) when n >= 0 do
+  def split(%FIFO{store: store}, n) when n >= 0 do
     {store2, store3} = :queue.split(n, store)
     {wrap_store(store2), wrap_store(store3)}
   end
 
   defimpl Enumerable do
     def count(queue) do
-      {:ok, Queue.length(queue)}
+      {:ok, FIFO.length(queue)}
     end
 
     def member?(queue, val) do
-      {:ok, Queue.member?(queue, val)}
+      {:ok, FIFO.member?(queue, val)}
     end
 
     def slice(queue) do
-      length = Queue.length(queue)
-      {:ok, length, &Enumerable.List.slice(Queue.to_list(queue), &1, &2, length)}
+      length = FIFO.length(queue)
+      {:ok, length, &Enumerable.List.slice(FIFO.to_list(queue), &1, &2, length)}
     end
 
     def reduce(queue, acc, fun) do
-      Enumerable.List.reduce(Queue.to_list(queue), acc, fun)
+      Enumerable.List.reduce(FIFO.to_list(queue), acc, fun)
     end
   end
 
@@ -408,7 +400,7 @@ defmodule Queue do
     def into(queue) do
       fun = fn
         list, {:cont, x} -> [x | list]
-        list, :done -> Queue.join(queue, Queue.from_list(Enum.reverse(list)))
+        list, :done -> FIFO.join(queue, FIFO.from_list(Enum.reverse(list)))
         _, :halt -> :ok
       end
 
@@ -421,7 +413,7 @@ defmodule Queue do
 
     def inspect(queue, opts) do
       opts = %Inspect.Opts{opts | charlists: :as_lists}
-      concat(["#Queue<", Inspect.List.inspect(Queue.to_list(queue), opts), ">"])
+      concat(["#FIFO<", Inspect.List.inspect(FIFO.to_list(queue), opts), ">"])
     end
   end
 end

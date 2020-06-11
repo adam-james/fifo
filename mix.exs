@@ -1,11 +1,11 @@
-defmodule Queue.MixProject do
+defmodule FIFO.MixProject do
   use Mix.Project
 
   @version "0.1.0"
 
   def project do
     [
-      app: :queue,
+      app: :fifo,
       version: @version,
       elixir: "~> 1.10",
       start_permanent: Mix.env() == :prod,
@@ -36,7 +36,7 @@ defmodule Queue.MixProject do
       ],
       main: "readme",
       source_ref: "v#{@version}",
-      source_url: "https://github.com/adam-james/queue"
+      source_url: "https://github.com/adam-james/fifo"
     ]
   end
 end

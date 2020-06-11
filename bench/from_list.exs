@@ -6,8 +6,8 @@ inputs = %{
 
 Benchee.run(%{
   ":queue.from_list" => fn list -> :queue.from_list(list) end,
-  "Queue.from_list" => fn list -> Queue.from_list(list) end,
-  "Queue.new" => fn list -> Queue.new(list) end
+  "FIFO.from_list" => fn list -> FIFO.from_list(list) end,
+  "FIFO.new" => fn list -> FIFO.new(list) end
 },
   inputs: inputs,
   memory_time: 1
